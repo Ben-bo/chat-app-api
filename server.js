@@ -9,7 +9,8 @@ app.use(
     origin: "*",
   })
 );
-
+const auth = require("./routes/authRoute");
+app.use("/api", auth);
 app.listen(process.env.PORT || 5000, () => {
   console.log(`SERVER IS RUNNING ON PORT : 5000`);
 });
