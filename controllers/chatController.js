@@ -99,8 +99,40 @@ const chatController = {
   replyMsg: async (req, res) => {
     try {
       const reciever = req.params.recId;
+      const sender = req.body.decodedToken.id;
+      const cekDataInbox = await inbox.findOne({
+        where: {
+          [Op.or]: [
+            { [Op.and]: [{ sender_id: sender }, { reciever_id: reciever }] },
+            { [Op.and]: [{ sender_id: reciever }, { reciever_id: sender }] },
+          ],
+        },
+      });
+      if (cekDataInbox) {
+        const dataInbox = {
+          sender_id: sender,
+          reciever_id: reciever,
+          lastmsg: req.body.msg,
+        };
+        await inbox.update(dataInbox, {
+          where: {
+            [Op.or]: [
+              { [Op.and]: [{ sender_id: sender }, { reciever_id: reciever }] },
+              { [Op.and]: [{ sender_id: reciever }, { reciever_id: sender }] },
+            ],
+          },
+        });
+      } else {
+        const dataInbox = {
+          sender_id: sender,
+          reciever_id: reciever,
+          lastmsg: req.body.msg,
+        };
+        await inbox.create(dataInbox);
+      }
+
       const data = {
-        sender_id: req.body.decodedToken.id,
+        sender_id: sender,
         reciever_id: reciever,
         msg: req.body.msg,
       };
@@ -118,7 +150,7 @@ const chatController = {
   inbox: async (req, res) => {
     try {
       const userId = req.body.decodedToken.id;
-      const list = await chatModel.findAll({
+      const list = await inbox.findAll({
         include: [
           {
             model: user,
@@ -135,7 +167,7 @@ const chatController = {
           [Op.or]: [{ reciever_id: userId }, { sender_id: userId }],
         },
         order: [["id", "ASC"]],
-        attributes: ["id", "sender_id", "msg"],
+        attributes: ["id", "lastmsg"],
       });
       if (list === null) {
         res.send({
