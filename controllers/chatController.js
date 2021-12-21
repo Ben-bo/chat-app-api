@@ -29,6 +29,86 @@ const chatController = {
         order: [["id", "ASC"]],
         attributes: ["id", "sender_id", "msg"],
       });
+      if (list === null) {
+        res.send({
+          message: "do data",
+        });
+      }
+      res.send({
+        list,
+      });
+    } catch (error) {
+      console.log(error);
+      res.send({
+        error,
+      });
+    }
+  },
+  createMessage: async (req, res) => {
+    try {
+      const data = {
+        sender_id: req.body.decodedToken.id,
+        reciever_id: req.body.reciever_id,
+        msg: req.body.msg,
+      };
+
+      const message = await chatModel.create(data);
+      res.send({
+        message,
+      });
+    } catch (error) {
+      console.log(error);
+      res.send({
+        error,
+      });
+    }
+  },
+  replyMsg: async (req, res) => {
+    try {
+      const reciever = req.params.recId;
+      const data = {
+        sender_id: req.body.decodedToken.id,
+        reciever_id: reciever,
+        msg: req.body.msg,
+      };
+      const reply = await chatModel.create(data);
+      res.send({
+        reply,
+      });
+    } catch (error) {
+      console.log(error);
+      res.send({
+        error,
+      });
+    }
+  },
+  inbox: async (req, res) => {
+    try {
+      const userId = req.body.decodedToken.id;
+      const list = await chatModel.findAll({
+        include: [
+          {
+            model: user,
+            as: "dataSender",
+            attributes: ["id", "name", "email"],
+          },
+          {
+            model: user,
+            as: "dataReciever",
+            attributes: ["id", "name", "email"],
+          },
+        ],
+        where: {
+          [Op.or]: [{ reciever_id: userId }, { sender_id: userId }],
+        },
+        order: [["id", "ASC"]],
+        attributes: ["id", "sender_id", "msg"],
+      });
+      if (list === null) {
+        res.send({
+          message: "do data",
+        });
+      }
       res.send({
         list,
       });

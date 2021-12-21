@@ -13,6 +13,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "sender_id",
         foreignKey: "reciever_id",
       });
+      user.hasMany(models.inbox, {
+        foreignKey: "sender_id",
+        foreignKey: "reciever_id",
+      });
     }
   }
   user.init(

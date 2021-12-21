@@ -3,12 +3,15 @@ const jwt = require("jsonwebtoken");
 const { user: userModel } = require("../models");
 const authController = {
   login: async (req, res) => {
+    let status = 200;
+    let message = "SUCCESS";
+    let data = {};
     try {
-      let status = 200;
-      let message = "SUCCESS";
-      let data = {};
-
-      const isUserExist = await userModel.findOne({ email: req.body.email });
+      console.log(req.body.email);
+      const isUserExist = await userModel.findOne({
+        where: { email: req.body.email },
+      });
+      console.log(isUserExist);
       if (!isUserExist) {
         message = "User not found";
         status = 500;
@@ -21,7 +24,7 @@ const authController = {
           message = "Incorrect password";
           status = 500;
         } else {
-          const token = await jwt.sign(
+          const token = jwt.sign(
             isUserExist.dataValues,
             process.env.SECRET_KEY
           );
