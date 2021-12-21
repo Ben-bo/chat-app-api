@@ -9,11 +9,21 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      inbox.belongsTo(models.user, {
+        foreignKey: "sender_id",
+        // foreignKey: "reciever_id",
+        as: "dataSender",
+      });
+      inbox.belongsTo(models.user, {
+        // foreignKey: "sender_id",
+        foreignKey: "reciever_id",
+        as: "dataReciever",
+      });
     }
   }
   inbox.init(
     {
-      user_id: DataTypes.INTEGER,
+      reciever_id: DataTypes.INTEGER,
       sender_id: DataTypes.INTEGER,
       lastmsg: DataTypes.STRING,
     },
