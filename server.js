@@ -10,7 +10,8 @@ app.use(
   })
 );
 const auth = require("./routes/authRoute");
-app.use("/api", auth);
+const list = require("./routes/chatRoute");
+app.use("/api", auth, list);
 app.listen(process.env.PORT || 5000, () => {
   console.log(`SERVER IS RUNNING ON PORT : 5000`);
 });

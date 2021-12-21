@@ -11,7 +11,13 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       chat.belongsTo(models.user, {
         foreignKey: "sender_id",
+        // foreignKey: "reciever_id",
+        as: "dataSender",
+      });
+      chat.belongsTo(models.user, {
+        // foreignKey: "sender_id",
         foreignKey: "reciever_id",
+        as: "dataReciever",
       });
     }
   }
