@@ -44,5 +44,40 @@ const authController = {
       });
     }
   },
+  register: async (req, res) => {
+    try {
+      let status = 200;
+      let message = "SUCCESS";
+      let data = {};
+      const saltRounds = 10;
+      const salt = bcrypt.genSaltSync(saltRounds);
+      const hashedPassword = bcrypt.hashSync(req.body.password, salt);
+      const isUserExist = await userModel.findOne({
+        where: {
+          email: req.body.email,
+        },
+      });
+
+      if (!isUserExist) {
+        data = await userModel.create({
+          email: req.body.email,
+          name: req.body.name,
+          password: hashedPassword,
+        });
+      } else {
+        message = "email already exist";
+        status = 500;
+      }
+      const { password, ...other } = data.dataValues;
+      res.status(status).json({
+        status,
+        message,
+        data: other,
+      });
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  },
 };
 module.exports = authController;
