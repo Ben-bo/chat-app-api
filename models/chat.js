@@ -9,6 +9,10 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      chat.belongsTo(models.user, {
+        foreignKey: "sender_id",
+        foreignKey: "reciever_id",
+      });
     }
   }
   chat.init(
